@@ -16,12 +16,24 @@ function tag(nfcEvent) {
                 navigator.notification.vibrate(100);
             }, 
             function (reason) {
-                navigator.notification.alert(reason, function() {}, "Hubo un problema");
+                navigator.notification.alert(reason, function() {}, "Hubo un Problema");
             }
         ); 
     }
     if(selector == 1){
+        
+        var tag = nfcEvent.tag,
+        ndefMessage = tag.ndefMessage;
+
+        // dump the raw json of the message
+        // note: real code will need to decode
+        // the payload from each record
+        //alert(JSON.stringify(ndefMessage));
+
+        // assuming the first record in the message has
+        // a payload that can be converted to a string.
         alert(nfc.bytesToString(ndefMessage[0].payload).substring(3));
+            
     }
 }
 
@@ -35,7 +47,7 @@ var ready = function () {
     alert('Failed to register NFC Listener');
   }
   
-  nfc.addTagDiscoveredListener(tag, win, fail);
+  nfc.addTagDiscoveredListener(Tag, win, fail);
   
 
   document.addEventListener("volumeupbutton", showSampleData, false);
