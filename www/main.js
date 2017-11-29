@@ -21,23 +21,24 @@ function tag(nfcEvent) {
         ); 
     }
     if(selector == 1){
+         nfc.addNdefListener (
+            function (nfcEvent) {
+                var tag = nfcEvent.tag,
+                    ndefMessage = tag.ndefMessage;
+                //alert(JSON.stringify(ndefMessage));
 
-            
-        var tag = nfcEvent.tag,
-            ndefMessage = tag.ndefMessage;
-        alert(JSON.stringify(ndefMessage));
+                // assuming the first record in the message has
+                // a payload that can be converted to a string.
+                alert(nfc.bytesToString(ndefMessage[0].payload));
+            },
+            function () { // success callback
+                alert("Esperando a la interfaz NDEF");
+            },
+            function (error) { // error callback
+                alert("Error agregando listener NDEF" + JSON.stringify(error));
+            }
+        );
 
-        // dump the raw json of the message
-        // note: real code will need to decode
-        // the payload from each record
-        //alert(JSON.stringify(ndefMessage));
-
-        // assuming the first record in the message has
-        // a payload that can be converted to a string.
-        //alert(nfc.bytesToString(ndefMessage[0].payload).substring(3));
-            
-        
-        /*
         nfc.addNdefListener (
             function (nfcEvent) {
                 var tag = nfcEvent.tag,
@@ -60,7 +61,6 @@ function tag(nfcEvent) {
                 alert("Error agregando listener NDEF" + JSON.stringify(error));
             }
         );
-        */
     }
 }
 
