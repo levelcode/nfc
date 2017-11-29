@@ -1,49 +1,54 @@
 /*global NdefPlugin, Ndef */
-
+var selector = 0 ;
 function writeTag(nfcEvent) {
-  // ignore what's on the tag for now, just overwrite
-    
-  var mimeType = document.forms[0].elements["mimeType"].value,
-    payload = document.forms[0].elements["payload"].value,
-    record = ndef.mimeMediaRecord(mimeType, nfc.stringToBytes(payload));
 
-  nfc.write(
-        [record], 
-        function () {
-            window.plugins.toast.showShortBottom("Wrote data to tag.");
-            navigator.notification.vibrate(100);
-        }, 
-        function (reason) {
-            navigator.notification.alert(reason, function() {}, "There was a problem");
-        }
-  );  
+    if(selector == 0){
+        // ignore what's on the tag for now, just overwrite
+    
+        var mimeType = document.forms[0].elements["mimeType"].value,
+        payload = document.forms[0].elements["payload"].value,
+        record = ndef.mimeMediaRecord(mimeType, nfc.stringToBytes(payload));
+
+        nfc.write(
+            [record], 
+            function () {
+                window.plugins.toast.showShortBottom("Wrote data to tag.");
+                navigator.notification.vibrate(100);
+            }, 
+            function (reason) {
+                navigator.notification.alert(reason, function() {}, "There was a problem");
+            }
+        ); 
+    }
+   
 }
+
 function readTag(nfcEvent) {
     // Read NDEF formatted NFC Tags
-    nfc.addNdefListener (
-        function (nfcEvent) {
-            var tag = nfcEvent.tag,
-                ndefMessage = tag.ndefMessage;
+    if(selector == 1){
+        nfc.addNdefListener (
+            function (nfcEvent) {
+                var tag = nfcEvent.tag,
+                    ndefMessage = tag.ndefMessage;
 
-            // dump the raw json of the message
-            // note: real code will need to decode
-            // the payload from each record
-            alert(JSON.stringify(ndefMessage));
+                // dump the raw json of the message
+                // note: real code will need to decode
+                // the payload from each record
+                //alert(JSON.stringify(ndefMessage));
 
-            // assuming the first record in the message has
-            // a payload that can be converted to a string.
-            alert(nfc.bytesToString(ndefMessage[0].payload).substring(3));
-        },
-        function () { // success callback
-            alert("Waiting for NDEF tag");
-        },
-        function (error) { // error callback
-            alert("Error adding NDEF listener " + JSON.stringify(error));
-        }
-    );
+                // assuming the first record in the message has
+                // a payload that can be converted to a string.
+                alert(nfc.bytesToString(ndefMessage[0].payload).substring(3));
+            },
+            function () { // success callback
+                alert("Waiting for NDEF tag");
+            },
+            function (error) { // error callback
+                alert("Error adding NDEF listener " + JSON.stringify(error));
+            }
+        );
+    }
 }
-
-
 
 var ready = function () {
   
@@ -55,7 +60,7 @@ var ready = function () {
     alert('Failed to register NFC Listener');
   }
   
-  //nfc.addTagDiscoveredListener(writeTag, win, fail);
+  nfc.addTagDiscoveredListener(writeTag, win, fail);
   nfc.addTagDiscoveredListener(readTag, win, fail);
 
   document.addEventListener("volumeupbutton", showSampleData, false);
@@ -116,8 +121,12 @@ function showSampleData(e) {
 
     if (e.type === 'volumedownbutton') {
         index--;
+        selector = 0;
+        alert("Escribiendo NFC");
     } else {
         index++;
+        selector = 1;
+        alert("Leyendo NFC");
     }
     
     if (index >= data.length) {
