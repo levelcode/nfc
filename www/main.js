@@ -20,6 +20,31 @@ function tag(nfcEvent) {
             }
         ); 
     }
+    
+    nfc.addNdefListener (
+        function (nfcEvent) {
+            if(selector == 1){
+                var tagVar = nfcEvent.tag,
+                    ndefMessage = tagVar.ndefMessage;
+
+                // dump the raw json of the message
+                // note: real code will need to decode
+                // the payload from each record
+                alert(JSON.stringify(ndefMessage));
+
+                // assuming the first record in the message has
+                // a payload that can be converted to a string.
+                alert(nfc.bytesToString(ndefMessage[0].payload).substring(3));
+            }
+        },
+        function () { // success callback
+            alert("Esperando a la interfaz NDEF");
+        },
+        function (error) { // error callback
+            alert("Error agregando listener NDEF" + JSON.stringify(error));
+        }
+    );
+    
 }
 
 var ready = function () {
@@ -39,36 +64,6 @@ var ready = function () {
   document.addEventListener("volumedownbutton", showSampleData, false);
 
 };
-
-
-onDeviceReady: function() {
-    app.receivedEvent('deviceready');
-
-    // Read NDEF formatted NFC Tags
-    nfc.addNdefListener (
-        function (nfcEvent) {
-            if(selector ==  1){
-                var tag = nfcEvent.tag,
-                    ndefMessage = tag.ndefMessage;
-
-                // dump the raw json of the message
-                // note: real code will need to decode
-                // the payload from each record
-                alert(JSON.stringify(ndefMessage));
-
-                // assuming the first record in the message has
-                // a payload that can be converted to a string.
-                alert(nfc.bytesToString(ndefMessage[0].payload).substring(3));
-            }
-        },
-        function () { // success callback
-            alert("Waiting for NDEF tag");
-        },
-        function (error) { // error callback
-            alert("Error adding NDEF listener " + JSON.stringify(error));
-        }
-    );
-},
 
 document.addEventListener('deviceready', ready, false);
 
